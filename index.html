@@ -25,6 +25,7 @@
     --pr: #15803d;
     --pr-soft: #dcfce7;
     --danger: #b91c1c;
+    --danger-soft: #fee2e2;
     color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
@@ -38,6 +39,7 @@
       --pr: #4ade80;
       --pr-soft: #14301f;
       --danger: #f87171;
+      --danger-soft: #3b1717;
       color-scheme: dark;
     }
   }
@@ -57,26 +59,54 @@
   header h1 { font-size: 1.6rem; margin: 0 0 2px; }
   header p { margin: 0 0 16px; color: var(--muted); }
 
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
-  .stat { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px; }
-  .stat b { display: block; font-size: 1.4rem; font-variant-numeric: tabular-nums; }
-  .stat span { font-size: .8rem; color: var(--muted); }
-
   section { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
   section h2 { font-size: 1.05rem; margin: 0 0 12px; }
-  label { display: block; font-size: .8rem; color: var(--muted); margin-bottom: 4px; }
-  input, select, button { font: inherit; color: inherit; }
-  input, select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); }
+  label { display: block; font-size: .8rem; color: var(--muted); margin: 10px 0 4px; }
+  label:first-child { margin-top: 0; }
+  input, select, button { font: inherit; color: inherit; touch-action: manipulation; }
+  input, select { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); }
+  input::-webkit-date-and-time-value { text-align: left; }
   input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-  .fila { display: grid; grid-template-columns: 1fr 1fr 1fr 1.4fr; gap: 10px; margin-top: 10px; }
-  @media (max-width: 480px) { .fila { grid-template-columns: 1fr 1fr; } }
+
+  .peso-ctrl { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; }
+  .peso-ctrl input { text-align: center; font-size: 1.25rem; font-weight: 600; }
+  .paso { min-width: 64px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); font-weight: 600; cursor: pointer; }
+  .paso:active { background: var(--border); }
+  .fila { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 10px; }
 
   .pista { margin: 8px 0 0; font-size: .85rem; color: var(--muted); }
-  .pista button { margin-left: 6px; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; font-size: .8rem; }
   .btn { display: block; width: 100%; margin-top: 14px; padding: 12px; border: 0; border-radius: 12px; background: var(--accent); color: #fff; font-weight: 600; cursor: pointer; }
   .btn:active { transform: scale(.99); }
   .sec { padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); cursor: pointer; }
   .sec:hover { border-color: var(--muted); }
+
+  .cab { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 12px; }
+  .cab h2 { margin: 0; }
+  .cab span { font-size: .85rem; color: var(--muted); }
+  .tira { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 8px; }
+  .tira span {
+    width: 100%; max-width: 40px; aspect-ratio: 1; justify-self: center;
+    display: grid; place-items: center; border-radius: 50%;
+    font-size: .8rem; font-weight: 600; color: var(--muted); background: var(--bg);
+  }
+  .tira .hecho { background: var(--accent); color: #fff; }
+  .tira .hoy { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .tira .futuro { opacity: .45; }
+  .semana { list-style: none; margin: 0; padding: 0; }
+  .semana button {
+    display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 10px;
+    width: 100%; padding: 10px 0; background: none; border: 0; border-top: 1px solid var(--border);
+    text-align: left; cursor: pointer;
+  }
+  .semana .nombre { font-weight: 600; min-width: 0; }
+  .semana small { display: block; font-weight: 400; font-size: .8rem; color: var(--muted); }
+  .semana .peso { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .semana .pendiente .nombre, .semana .pendiente .peso { color: var(--muted); }
+  .cambio { min-width: 76px; padding: 3px 8px; border-radius: 999px; font-size: .8rem; font-weight: 700; text-align: center; white-space: nowrap; }
+  .cambio.sube { background: var(--pr-soft); color: var(--pr); }
+  .cambio.baja { background: var(--danger-soft); color: var(--danger); }
+  .cambio.igual, .cambio.nuevo { background: var(--bg); color: var(--muted); }
+  .cambio.falta { border: 1px dashed var(--border); color: var(--muted); font-weight: 600; }
 
   #grafica { width: 100%; height: 200px; display: block; margin-top: 12px; }
   #grafica .grid { stroke: var(--border); }
@@ -88,7 +118,7 @@
   .info { margin: 8px 0 0; font-size: .9rem; color: var(--muted); }
 
   .dia + .dia { margin-top: 16px; }
-  .dia h3 { display: flex; justify-content: space-between; gap: 8px; font-size: .85rem; font-weight: 600; color: var(--muted); margin: 0 0 4px; }
+  .dia h3 { font-size: .85rem; font-weight: 600; color: var(--muted); margin: 0 0 4px; }
   .dia ul { list-style: none; margin: 0; padding: 0; }
   .dia li { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-top: 1px solid var(--border); }
   .dia .ej { flex: 1; min-width: 0; background: none; border: 0; padding: 0; font-weight: 600; text-align: left; cursor: pointer; }
@@ -97,6 +127,7 @@
   .badge { font-size: .7rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--pr-soft); color: var(--pr); white-space: nowrap; }
   .borrar { border: 0; background: none; color: var(--muted); font-size: 1.3rem; line-height: 1; cursor: pointer; padding: 2px 8px; border-radius: 8px; }
   .borrar:hover { color: var(--danger); background: var(--bg); }
+  .mas { display: block; margin: 14px auto 0; }
   .vacio { text-align: center; color: var(--muted); padding: 8px 0; }
   .pie { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
 
@@ -126,21 +157,21 @@
     <p>Apunta lo que levantas y mira cómo subes.</p>
   </header>
 
-  <div class="stats">
-    <div class="stat"><b id="stDias">0</b><span>Días entrenados</span></div>
-    <div class="stat"><b id="stSemana">0</b><span>Últimos 7 días</span></div>
-    <div class="stat"><b id="stVolumen">0</b><span>Kg levantados</span></div>
-  </div>
-
   <section>
-    <h2>Nuevo registro</h2>
     <form id="form" autocomplete="off">
       <label for="ejercicio">Ejercicio</label>
       <input id="ejercicio" list="listaEj" placeholder="Press banca, sentadilla…" required />
       <datalist id="listaEj"></datalist>
       <p id="pista" class="pista" hidden></p>
+
+      <label for="peso">Peso (kg)</label>
+      <div class="peso-ctrl">
+        <button type="button" class="paso" data-paso="-2.5" aria-label="Restar 2,5 kg">−2,5</button>
+        <input id="peso" type="text" inputmode="decimal" pattern="\d+([.,]\d+)?" title="Un número, por ejemplo 62,5" required />
+        <button type="button" class="paso" data-paso="2.5" aria-label="Sumar 2,5 kg">+2,5</button>
+      </div>
+
       <div class="fila">
-        <div><label for="peso">Peso (kg)</label><input id="peso" type="text" inputmode="decimal" pattern="\d+([.,]\d+)?" title="Un número, por ejemplo 62,5" required /></div>
         <div><label for="series">Series</label><input id="series" type="number" inputmode="numeric" min="1" step="1" value="3" required /></div>
         <div><label for="reps">Reps</label><input id="reps" type="number" inputmode="numeric" min="1" step="1" value="10" required /></div>
         <div><label for="fecha">Fecha</label><input id="fecha" type="date" required /></div>
@@ -149,10 +180,20 @@
     </form>
   </section>
 
+  <section>
+    <div class="cab">
+      <h2>Esta semana</h2>
+      <span id="semTxt"></span>
+    </div>
+    <div id="tira" class="tira" aria-hidden="true"></div>
+    <ul id="semana" class="semana"></ul>
+    <p id="semAyuda" class="info"></p>
+  </section>
+
   <section id="seccionProgreso">
-    <h2>Progreso</h2>
+    <h2>Progreso por semanas</h2>
     <select id="selEj" aria-label="Ejercicio a mostrar"></select>
-    <svg id="grafica" role="img" aria-label="Peso máximo por día"></svg>
+    <svg id="grafica" role="img" aria-label="Peso máximo por semana"></svg>
     <p id="infoGrafica" class="info"></p>
   </section>
 
@@ -173,16 +214,20 @@
   const KEY = 'registro-gym-v1';
   const SUGERENCIAS = ['Press banca', 'Sentadilla', 'Peso muerto', 'Press militar', 'Dominadas', 'Remo con barra',
     'Curl de bíceps', 'Extensión de tríceps', 'Prensa de piernas', 'Hip thrust', 'Zancadas', 'Jalón al pecho'];
+  const DIAS_SEMANA = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+  const esMovil = matchMedia('(pointer: coarse)').matches;
 
   const $ = s => document.querySelector(s);
   const clave = n => n.trim().toLowerCase().replace(/\s+/g, ' ');
   const ordenar = (a, b) => a.fecha.localeCompare(b.fecha) || a.creado - b.creado;
   const num = n => n.toLocaleString('es-ES', { maximumFractionDigits: 2 });
   const kg = n => `${num(n)} kg`;
-  const volumen = r => r.peso * r.series * r.reps;
+  const leerPeso = () => Number($('#peso').value.replace(',', '.'));
 
   let registros = cargar();
   let ejSeleccionado = '';
+  let diasVisibles = 7;
+  let editadoAMano = false; // si el usuario ya tocó peso/series/reps, no los autorrellenamos
 
   function cargar() {
     try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; }
@@ -198,10 +243,21 @@
   const hoy = () => iso(new Date());
   const aFecha = f => new Date(f + 'T00:00');
   const diasDesde = f => Math.round((aFecha(hoy()) - aFecha(f)) / 864e5);
+  function sumarDias(f, n) {
+    const d = aFecha(f);
+    d.setDate(d.getDate() + n);
+    return iso(d);
+  }
+  // Las semanas empiezan en lunes; cada semana se identifica por la fecha de su lunes
+  const lunes = f => sumarDias(f, -((aFecha(f).getDay() + 6) % 7));
 
   function haceCuanto(f) {
     const d = diasDesde(f);
     return d === 0 ? 'hoy' : d === 1 ? 'ayer' : d < 0 ? 'en el futuro' : `hace ${d} días`;
+  }
+  function haceSemanas(semana) {
+    const n = Math.round((aFecha(lunes(hoy())) - aFecha(semana)) / (7 * 864e5));
+    return n === 1 ? 'semana pasada' : `hace ${n} semanas`;
   }
   function fechaLarga(f) {
     const t = aFecha(f).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -230,6 +286,14 @@
   }
 
   const delEjercicio = k => registros.filter(r => clave(r.ejercicio) === k);
+  const ultimoDe = k => delEjercicio(k).sort(ordenar).at(-1);
+
+  // Peso máximo de cada semana: Map(lunes -> kg)
+  function maxPorSemana(lista) {
+    const m = new Map();
+    lista.forEach(r => { const s = lunes(r.fecha); m.set(s, Math.max(m.get(s) ?? -Infinity, r.peso)); });
+    return m;
+  }
 
   // Un registro es récord si supera el peso máximo anterior de ese ejercicio
   function calcularRecords() {
@@ -246,19 +310,67 @@
   // ---------- Pintado ----------
 
   function pintar() {
-    pintarStats();
+    pintarSemana();
     pintarListas();
     pintarGrafica();
     pintarHistorial();
   }
 
-  function pintarStats() {
-    const dias = new Set(registros.map(r => r.fecha));
-    const semana = [...dias].filter(f => { const d = diasDesde(f); return d >= 0 && d < 7; }).length;
-    const vol = registros.reduce((s, r) => s + volumen(r), 0);
-    $('#stDias').textContent = dias.size;
-    $('#stSemana').textContent = semana;
-    $('#stVolumen').textContent = vol >= 10000 ? `${num(Math.round(vol / 100) / 10)} t` : num(vol);
+  function pintarSemana() {
+    const lunesHoy = lunes(hoy());
+    const lunesPasado = sumarDias(lunesHoy, -7);
+    const fechas = new Set(registros.map(r => r.fecha));
+
+    // Tira L M X J V S D con los días entrenados
+    $('#tira').replaceChildren(...DIAS_SEMANA.map((letra, i) => {
+      const f = sumarDias(lunesHoy, i);
+      const clases = [fechas.has(f) && 'hecho', f === hoy() && 'hoy', f > hoy() && 'futuro'].filter(Boolean);
+      return el('span', { className: clases.join(' '), textContent: letra });
+    }));
+    const diasSemana = n => [...fechas].filter(f => f >= n && f < sumarDias(n, 7)).length;
+    const estas = diasSemana(lunesHoy);
+    $('#semTxt').textContent = `${estas} ${estas === 1 ? 'día' : 'días'} · la pasada: ${diasSemana(lunesPasado)}`;
+
+    // Ejercicios hechos esta semana (comparados con la última semana en que se hicieron)
+    // y ejercicios de la semana pasada que aún faltan
+    const hechos = [], pendientes = [];
+    for (const [k, nombre] of nombresEjercicios()) {
+      const lista = delEjercicio(k).sort(ordenar);
+      const semanas = maxPorSemana(lista);
+      const actual = semanas.get(lunesHoy);
+      const previa = [...semanas].filter(([s]) => s < lunesHoy).sort((a, b) => b[0].localeCompare(a[0]))[0];
+      const primeraVezEn = s => { const r = lista.find(r => lunes(r.fecha) === s); return r.fecha + r.creado; };
+      if (actual !== undefined) hechos.push({ k, nombre, actual, previa, orden: primeraVezEn(lunesHoy) });
+      else if (previa?.[0] === lunesPasado) pendientes.push({ k, nombre, previa, orden: primeraVezEn(lunesPasado) });
+    }
+    hechos.sort((a, b) => a.orden.localeCompare(b.orden));
+    pendientes.sort((a, b) => a.orden.localeCompare(b.orden));
+
+    const fila = ({ k, nombre, actual, previa }) => {
+      const pendiente = actual === undefined;
+      let cambio;
+      if (pendiente) cambio = el('span', { className: 'cambio falta', textContent: 'Pendiente' });
+      else if (!previa) cambio = el('span', { className: 'cambio nuevo', textContent: 'Nuevo' });
+      else {
+        const dif = actual - previa[1];
+        cambio = dif > 0 ? el('span', { className: 'cambio sube', textContent: `↑ +${kg(dif)}` })
+          : dif < 0 ? el('span', { className: 'cambio baja', textContent: `↓ −${kg(-dif)}` })
+          : el('span', { className: 'cambio igual', textContent: '= igual' });
+      }
+      const detalle = previa ? `${haceSemanas(previa[0])}: ${kg(previa[1])}` : 'primera vez';
+      return el('li', { className: pendiente ? 'pendiente' : '' }, el('button', { type: 'button', onclick: () => rellenar(k) },
+        el('span', { className: 'nombre' }, nombre, el('small', { textContent: detalle })),
+        el('span', { className: 'peso', textContent: pendiente ? '—' : kg(actual) }),
+        cambio
+      ));
+    };
+    $('#semana').replaceChildren(...hechos.map(fila), ...pendientes.map(fila));
+
+    $('#semAyuda').textContent = hechos.length || pendientes.length
+      ? 'Toca un ejercicio para apuntarlo con el peso de la última vez.'
+      : registros.length
+        ? 'Aún no has entrenado esta semana. ¡A por ello!'
+        : 'Aquí verás si esta semana levantas más que la anterior.';
   }
 
   function pintarListas() {
@@ -285,10 +397,8 @@
     }
     svg.style.display = '';
 
-    // Peso máximo de cada día
-    const porFecha = new Map();
-    delEjercicio(ejSeleccionado).forEach(r => porFecha.set(r.fecha, Math.max(porFecha.get(r.fecha) ?? -Infinity, r.peso)));
-    const pts = [...porFecha].sort((a, b) => a[0].localeCompare(b[0]));
+    // Un punto por semana con el peso máximo de esa semana
+    const pts = [...maxPorSemana(delEjercicio(ejSeleccionado))].sort((a, b) => a[0].localeCompare(b[0]));
     const pesos = pts.map(p => p[1]);
     const lo = Math.min(...pesos), hi = Math.max(...pesos);
 
@@ -310,7 +420,7 @@
       s += `<polyline class="linea" points="${linea}"/>`;
     }
     pts.forEach((p, i) => {
-      s += `<circle class="${p[1] === hi ? 'top' : ''}" cx="${x(i)}" cy="${y(p[1])}" r="5"><title>${fechaCorta(p[0])}: ${kg(p[1])}</title></circle>`;
+      s += `<circle class="${p[1] === hi ? 'top' : ''}" cx="${x(i)}" cy="${y(p[1])}" r="5"><title>Semana del ${fechaCorta(p[0])}: ${kg(p[1])}</title></circle>`;
     });
     s += `<text x="${x(0)}" y="${H - 6}" text-anchor="${pts.length === 1 ? 'middle' : 'start'}">${fechaCorta(pts[0][0])}</text>`;
     if (pts.length > 1) s += `<text x="${x(pts.length - 1)}" y="${H - 6}" text-anchor="end">${fechaCorta(pts.at(-1)[0])}</text>`;
@@ -318,11 +428,11 @@
     svg.innerHTML = s;
 
     if (pts.length === 1) {
-      info.textContent = `Primer registro: ${kg(hi)}. Vuelve a entrenarlo para ver la línea de progreso.`;
+      info.textContent = `Primera semana: ${kg(hi)}. La semana que viene ya verás la línea de progreso.`;
     } else {
       const dif = pts.at(-1)[1] - pts[0][1];
-      const tendencia = dif > 0 ? `📈 +${kg(dif)} desde el primer día` : dif < 0 ? `📉 ${kg(dif)} desde el primer día` : 'Igual que el primer día';
-      info.textContent = `Récord: ${kg(hi)} · ${tendencia} · ${pts.length} sesiones`;
+      const tendencia = dif > 0 ? `📈 +${kg(dif)} desde la primera semana` : dif < 0 ? `📉 ${kg(dif)} desde la primera semana` : 'Igual que la primera semana';
+      info.textContent = `Récord: ${kg(hi)} · ${tendencia} · ${pts.length} semanas`;
     }
   }
 
@@ -340,9 +450,8 @@
       porDia.get(r.fecha).push(r);
     });
 
-    const dias = [...porDia].map(([fecha, lista]) => {
-      const vol = lista.reduce((s, r) => s + volumen(r), 0);
-      const cabecera = el('h3', {}, el('span', { textContent: fechaLarga(fecha) }), el('span', { textContent: `${num(vol)} kg` }));
+    const todos = [...porDia];
+    const dias = todos.slice(0, diasVisibles).map(([fecha, lista]) => {
       const items = lista.map(r => el('li', {},
         el('button', {
           type: 'button', className: 'ej', textContent: r.ejercicio, title: 'Ver progreso',
@@ -352,23 +461,41 @@
         el('span', { className: 'det', textContent: `${kg(r.peso)} · ${r.series}×${r.reps}` }),
         el('button', { type: 'button', className: 'borrar', textContent: '×', ariaLabel: `Borrar ${r.ejercicio}`, onclick: () => borrar(r) })
       ));
-      return el('div', { className: 'dia' }, cabecera, el('ul', {}, ...items));
+      return el('div', { className: 'dia' }, el('h3', { textContent: fechaLarga(fecha) }), el('ul', {}, ...items));
     });
+    if (todos.length > diasVisibles) {
+      dias.push(el('button', {
+        type: 'button', className: 'sec mas', textContent: 'Ver días anteriores',
+        onclick: () => { diasVisibles += 7; pintarHistorial(); }
+      }));
+    }
     cont.replaceChildren(...dias);
   }
 
   function actualizarPista() {
     const p = $('#pista');
-    const previos = delEjercicio(clave($('#ejercicio').value)).sort(ordenar);
+    const previos = delEjercicio(clave($('#ejercicio').value));
     if (!previos.length) { p.hidden = true; return; }
-    const ult = previos.at(-1);
+    const ult = previos.sort(ordenar).at(-1);
     const record = Math.max(...previos.map(r => r.peso));
-    const repetir = el('button', {
-      type: 'button', textContent: 'Repetir',
-      onclick: () => { $('#peso').value = num(ult.peso); $('#series').value = ult.series; $('#reps').value = ult.reps; $('#peso').focus(); }
-    });
-    p.replaceChildren(`Última vez (${haceCuanto(ult.fecha)}): ${kg(ult.peso)} · ${ult.series}×${ult.reps} — Récord: ${kg(record)}`, repetir);
+    p.textContent = `Última vez (${haceCuanto(ult.fecha)}): ${kg(ult.peso)} · ${ult.series}×${ult.reps} — Récord: ${kg(record)}`;
     p.hidden = false;
+  }
+
+  function ponerNumeros(r) {
+    $('#peso').value = num(r.peso);
+    $('#series').value = r.series;
+    $('#reps').value = r.reps;
+    editadoAMano = false;
+  }
+
+  // Al tocar un ejercicio de "Esta semana": rellena el formulario con lo de la última vez
+  function rellenar(k) {
+    const ult = ultimoDe(k);
+    $('#ejercicio').value = ult.ejercicio;
+    ponerNumeros(ult);
+    actualizarPista();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // ---------- Toast ----------
@@ -398,7 +525,7 @@
     const r = {
       id: nuevoId(),
       ejercicio: nombre,
-      peso: Number($('#peso').value.replace(',', '.')),
+      peso: leerPeso(),
       series: Number($('#series').value),
       reps: Number($('#reps').value),
       fecha: $('#fecha').value || hoy(),
@@ -417,9 +544,28 @@
 
     $('#ejercicio').value = '';
     $('#peso').value = '';
+    editadoAMano = false;
     actualizarPista();
-    $('#ejercicio').focus();
+    // En el móvil cerramos el teclado para que se vea "Esta semana"; en el PC seguimos escribiendo
+    if (esMovil) document.activeElement?.blur();
+    else $('#ejercicio').focus();
   });
+
+  $('#ejercicio').addEventListener('input', () => {
+    if (!editadoAMano) {
+      const ult = ultimoDe(clave($('#ejercicio').value));
+      if (ult) ponerNumeros(ult);
+      else $('#peso').value = '';
+    }
+    actualizarPista();
+  });
+  for (const id of ['#peso', '#series', '#reps']) $(id).addEventListener('input', () => { editadoAMano = true; });
+
+  document.querySelectorAll('.paso').forEach(b => b.addEventListener('click', () => {
+    const nuevo = Math.max(0, (leerPeso() || 0) + Number(b.dataset.paso));
+    $('#peso').value = num(nuevo);
+    editadoAMano = true;
+  }));
 
   function borrar(r) {
     registros = registros.filter(x => x.id !== r.id);
@@ -446,7 +592,7 @@
 
     // En el móvil abre el menú de compartir (Guardar en Archivos, WhatsApp, correo…)
     const archivo = new File([csv], nombre, { type: 'text/csv' });
-    if (matchMedia('(pointer: coarse)').matches && navigator.canShare?.({ files: [archivo] })) {
+    if (esMovil && navigator.canShare?.({ files: [archivo] })) {
       try { await navigator.share({ files: [archivo] }); return; }
       catch (e) { if (e.name === 'AbortError') return; }
     }
@@ -456,23 +602,29 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
 
+  // 5 semanas de lunes, miércoles y viernes, subiendo de peso cada semana
   function cargarDemo() {
-    const plan = [['Press banca', 50, 2.5], ['Sentadilla', 70, 5], ['Peso muerto', 90, 5]];
-    const sesiones = 10;
-    for (let i = 0; i < sesiones; i++) {
-      const d = new Date();
-      d.setDate(d.getDate() - (sesiones - 1 - i) * 3);
-      plan.forEach(([ejercicio, base, paso], j) => {
-        const subida = Math.floor((i + j) / 2) * paso;
-        registros.push({ id: nuevoId(), ejercicio, peso: base + subida, series: 3, reps: 8, fecha: iso(d), creado: d.getTime() + j });
-      });
+    const pesos = {
+      'Press banca': [50, 52.5, 55, 57.5, 60],
+      'Sentadilla': [70, 75, 80, 85, 85],
+      'Peso muerto': [90, 95, 95, 100, 105],
+    };
+    const rutina = [[0, ['Press banca', 'Sentadilla']], [2, ['Sentadilla', 'Peso muerto']], [4, ['Press banca', 'Peso muerto']]];
+    const lunesHoy = lunes(hoy());
+    for (let semana = 0; semana < 5; semana++) {
+      for (const [dia, ejercicios] of rutina) {
+        const fecha = sumarDias(lunesHoy, (semana - 4) * 7 + dia);
+        if (fecha > hoy()) continue;
+        ejercicios.forEach((ejercicio, j) => registros.push({
+          id: nuevoId(), ejercicio, peso: pesos[ejercicio][semana], series: 3, reps: 8, fecha, creado: aFecha(fecha).getTime() + j,
+        }));
+      }
     }
     guardar();
     pintar();
     toast('Datos de ejemplo cargados. Bórralos cuando quieras con «Borrar todo».');
   }
 
-  $('#ejercicio').addEventListener('input', actualizarPista);
   $('#selEj').addEventListener('change', e => { ejSeleccionado = e.target.value; pintarGrafica(); });
   window.addEventListener('resize', pintarGrafica);
 
