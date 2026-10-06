@@ -204,7 +204,6 @@
 
   <div class="pie">
     <button type="button" class="sec" id="exportar">Exportar a CSV</button>
-    <button type="button" class="sec" id="borrarTodo">Borrar todo</button>
   </div>
 </main>
 
@@ -439,8 +438,7 @@
   function pintarHistorial() {
     const cont = $('#historial');
     if (!registros.length) {
-      const demo = el('button', { type: 'button', className: 'sec', textContent: 'Probar con datos de ejemplo', onclick: cargarDemo });
-      cont.replaceChildren(el('div', { className: 'vacio' }, el('p', { textContent: 'Aún no hay nada registrado. ¡A por ello! 💪' }), demo));
+      cont.replaceChildren(el('p', { className: 'vacio', textContent: 'Aún no hay nada registrado. ¡A por ello! 💪' }));
       return;
     }
     const prs = calcularRecords();
@@ -574,14 +572,6 @@
     toast(`Borrado: ${r.ejercicio}`, { accion: { texto: 'Deshacer', fn: () => { registros.push(r); guardar(); pintar(); } } });
   }
 
-  $('#borrarTodo').addEventListener('click', () => {
-    if (!registros.length) return;
-    if (!confirm('¿Seguro que quieres borrar todos los registros? No se puede deshacer.')) return;
-    registros = [];
-    guardar();
-    pintar();
-  });
-
   // CSV con ; y coma decimal para que Excel en español lo abra bien
   $('#exportar').addEventListener('click', async () => {
     if (!registros.length) { toast('No hay nada que exportar todavía'); return; }
@@ -601,29 +591,6 @@
     el('a', { href: url, download: nombre }).click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
-
-  // 5 semanas de lunes, miércoles y viernes, subiendo de peso cada semana
-  function cargarDemo() {
-    const pesos = {
-      'Press banca': [50, 52.5, 55, 57.5, 60],
-      'Sentadilla': [70, 75, 80, 85, 85],
-      'Peso muerto': [90, 95, 95, 100, 105],
-    };
-    const rutina = [[0, ['Press banca', 'Sentadilla']], [2, ['Sentadilla', 'Peso muerto']], [4, ['Press banca', 'Peso muerto']]];
-    const lunesHoy = lunes(hoy());
-    for (let semana = 0; semana < 5; semana++) {
-      for (const [dia, ejercicios] of rutina) {
-        const fecha = sumarDias(lunesHoy, (semana - 4) * 7 + dia);
-        if (fecha > hoy()) continue;
-        ejercicios.forEach((ejercicio, j) => registros.push({
-          id: nuevoId(), ejercicio, peso: pesos[ejercicio][semana], series: 3, reps: 8, fecha, creado: aFecha(fecha).getTime() + j,
-        }));
-      }
-    }
-    guardar();
-    pintar();
-    toast('Datos de ejemplo cargados. Bórralos cuando quieras con «Borrar todo».');
-  }
 
   $('#selEj').addEventListener('change', e => { ejSeleccionado = e.target.value; pintarGrafica(); });
   window.addEventListener('resize', pintarGrafica);
