@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#0f1115" media="(prefers-color-scheme: dark)" />
+<!-- Para "Añadir a pantalla de inicio" en iPhone: se abre a pantalla completa como una app -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Gym" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<link rel="apple-touch-icon" href="icono.png" />
+<link rel="icon" href="icono.png" />
+<link rel="manifest" href="manifest.json" />
+<title>Registro de Gym</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --card: #ffffff;
+    --text: #15171c;
+    --muted: #6b7280;
+    --border: #e3e5e9;
+    --accent: #e8551f;
+    --pr: #15803d;
+    --pr-soft: #dcfce7;
+    --danger: #b91c1c;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1115;
+      --card: #181b21;
+      --text: #eceef2;
+      --muted: #9aa1ad;
+      --border: #2a2f38;
+      --accent: #ff6d3a;
+      --pr: #4ade80;
+      --pr-soft: #14301f;
+      --danger: #f87171;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main {
+    max-width: 640px; margin: 0 auto;
+    /* env(safe-area-inset-*) evita el notch y la barra de inicio del iPhone */
+    padding: calc(24px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right))
+             calc(96px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
+  }
+  header h1 { font-size: 1.6rem; margin: 0 0 2px; }
+  header p { margin: 0 0 16px; color: var(--muted); }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .stat { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px; }
+  .stat b { display: block; font-size: 1.4rem; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: .8rem; color: var(--muted); }
+
+  section { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
+  section h2 { font-size: 1.05rem; margin: 0 0 12px; }
+  label { display: block; font-size: .8rem; color: var(--muted); margin-bottom: 4px; }
+  input, select, button { font: inherit; color: inherit; }
+  input, select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); }
+  input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .fila { display: grid; grid-template-columns: 1fr 1fr 1fr 1.4fr; gap: 10px; margin-top: 10px; }
+  @media (max-width: 480px) { .fila { grid-template-columns: 1fr 1fr; } }
+
+  .pista { margin: 8px 0 0; font-size: .85rem; color: var(--muted); }
+  .pista button { margin-left: 6px; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; font-size: .8rem; }
+  .btn { display: block; width: 100%; margin-top: 14px; padding: 12px; border: 0; border-radius: 12px; background: var(--accent); color: #fff; font-weight: 600; cursor: pointer; }
+  .btn:active { transform: scale(.99); }
+  .sec { padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); cursor: pointer; }
+  .sec:hover { border-color: var(--muted); }
+
+  #grafica { width: 100%; height: 200px; display: block; margin-top: 12px; }
+  #grafica .grid { stroke: var(--border); }
+  #grafica text { fill: var(--muted); font-size: 11px; }
+  #grafica .linea { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+  #grafica .area { fill: var(--accent); opacity: .12; }
+  #grafica circle { fill: var(--card); stroke: var(--accent); stroke-width: 2; }
+  #grafica circle.top { fill: var(--accent); }
+  .info { margin: 8px 0 0; font-size: .9rem; color: var(--muted); }
+
+  .dia + .dia { margin-top: 16px; }
+  .dia h3 { display: flex; justify-content: space-between; gap: 8px; font-size: .85rem; font-weight: 600; color: var(--muted); margin: 0 0 4px; }
+  .dia ul { list-style: none; margin: 0; padding: 0; }
+  .dia li { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-top: 1px solid var(--border); }
+  .dia .ej { flex: 1; min-width: 0; background: none; border: 0; padding: 0; font-weight: 600; text-align: left; cursor: pointer; }
+  .dia .ej:hover { color: var(--accent); }
+  .det { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .badge { font-size: .7rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--pr-soft); color: var(--pr); white-space: nowrap; }
+  .borrar { border: 0; background: none; color: var(--muted); font-size: 1.3rem; line-height: 1; cursor: pointer; padding: 2px 8px; border-radius: 8px; }
+  .borrar:hover { color: var(--danger); background: var(--bg); }
+  .vacio { text-align: center; color: var(--muted); padding: 8px 0; }
+  .pie { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 10;
+    display: flex; gap: 12px; align-items: center;
+    max-width: calc(100% - 32px); padding: 12px 16px; border-radius: 12px;
+    background: var(--text); color: var(--bg);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+    transform: translate(-50%, 140%); transition: transform .25s ease;
+  }
+  .toast.visible { transform: translate(-50%, 0); }
+  .toast.pr { background: #15803d; color: #fff; font-weight: 600; }
+  .toast.pr.visible { animation: pop .5s ease; }
+  .toast button { background: none; border: 1px solid currentColor; color: inherit; border-radius: 8px; padding: 4px 10px; cursor: pointer; }
+  @keyframes pop {
+    0% { transform: translate(-50%, 0) scale(.8); }
+    60% { transform: translate(-50%, 0) scale(1.06); }
+    100% { transform: translate(-50%, 0) scale(1); }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>💪 Registro de Gym</h1>
+    <p>Apunta lo que levantas y mira cómo subes.</p>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><b id="stDias">0</b><span>Días entrenados</span></div>
+    <div class="stat"><b id="stSemana">0</b><span>Últimos 7 días</span></div>
+    <div class="stat"><b id="stVolumen">0</b><span>Kg levantados</span></div>
+  </div>
+
+  <section>
+    <h2>Nuevo registro</h2>
+    <form id="form" autocomplete="off">
+      <label for="ejercicio">Ejercicio</label>
+      <input id="ejercicio" list="listaEj" placeholder="Press banca, sentadilla…" required />
+      <datalist id="listaEj"></datalist>
+      <p id="pista" class="pista" hidden></p>
+      <div class="fila">
+        <div><label for="peso">Peso (kg)</label><input id="peso" type="text" inputmode="decimal" pattern="\d+([.,]\d+)?" title="Un número, por ejemplo 62,5" required /></div>
+        <div><label for="series">Series</label><input id="series" type="number" inputmode="numeric" min="1" step="1" value="3" required /></div>
+        <div><label for="reps">Reps</label><input id="reps" type="number" inputmode="numeric" min="1" step="1" value="10" required /></div>
+        <div><label for="fecha">Fecha</label><input id="fecha" type="date" required /></div>
+      </div>
+      <button class="btn" type="submit">Guardar</button>
+    </form>
+  </section>
+
+  <section id="seccionProgreso">
+    <h2>Progreso</h2>
+    <select id="selEj" aria-label="Ejercicio a mostrar"></select>
+    <svg id="grafica" role="img" aria-label="Peso máximo por día"></svg>
+    <p id="infoGrafica" class="info"></p>
+  </section>
+
+  <section>
+    <h2>Historial</h2>
+    <div id="historial"></div>
+  </section>
+
+  <div class="pie">
+    <button type="button" class="sec" id="exportar">Exportar a CSV</button>
+    <button type="button" class="sec" id="borrarTodo">Borrar todo</button>
+  </div>
+</main>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+  const KEY = 'registro-gym-v1';
+  const SUGERENCIAS = ['Press banca', 'Sentadilla', 'Peso muerto', 'Press militar', 'Dominadas', 'Remo con barra',
+    'Curl de bíceps', 'Extensión de tríceps', 'Prensa de piernas', 'Hip thrust', 'Zancadas', 'Jalón al pecho'];
+
+  const $ = s => document.querySelector(s);
+  const clave = n => n.trim().toLowerCase().replace(/\s+/g, ' ');
+  const ordenar = (a, b) => a.fecha.localeCompare(b.fecha) || a.creado - b.creado;
+  const num = n => n.toLocaleString('es-ES', { maximumFractionDigits: 2 });
+  const kg = n => `${num(n)} kg`;
+  const volumen = r => r.peso * r.series * r.reps;
+
+  let registros = cargar();
+  let ejSeleccionado = '';
+
+  function cargar() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; }
+  }
+  function guardar() {
+    try { localStorage.setItem(KEY, JSON.stringify(registros)); } catch {}
+  }
+
+  function iso(d) {
+    const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+    return local.toISOString().slice(0, 10);
+  }
+  const hoy = () => iso(new Date());
+  const aFecha = f => new Date(f + 'T00:00');
+  const diasDesde = f => Math.round((aFecha(hoy()) - aFecha(f)) / 864e5);
+
+  function haceCuanto(f) {
+    const d = diasDesde(f);
+    return d === 0 ? 'hoy' : d === 1 ? 'ayer' : d < 0 ? 'en el futuro' : `hace ${d} días`;
+  }
+  function fechaLarga(f) {
+    const t = aFecha(f).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+    return t.charAt(0).toUpperCase() + t.slice(1);
+  }
+  const fechaCorta = f => aFecha(f).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+
+  function el(tag, props = {}, ...hijos) {
+    const e = document.createElement(tag);
+    Object.assign(e, props);
+    e.append(...hijos);
+    return e;
+  }
+
+  // Nombres únicos de ejercicios (se queda con cómo se escribió la última vez)
+  function nombresEjercicios() {
+    const m = new Map();
+    [...registros].sort(ordenar).forEach(r => m.set(clave(r.ejercicio), r.ejercicio));
+    return m;
+  }
+
+  function normalizar(texto) {
+    const t = texto.trim().replace(/\s+/g, ' ');
+    if (!t) return '';
+    return nombresEjercicios().get(clave(t)) || t.charAt(0).toUpperCase() + t.slice(1);
+  }
+
+  const delEjercicio = k => registros.filter(r => clave(r.ejercicio) === k);
+
+  // Un registro es récord si supera el peso máximo anterior de ese ejercicio
+  function calcularRecords() {
+    const max = new Map();
+    const prs = new Set();
+    [...registros].sort(ordenar).forEach(r => {
+      const k = clave(r.ejercicio);
+      if (!max.has(k)) max.set(k, r.peso);
+      else if (r.peso > max.get(k)) { prs.add(r.id); max.set(k, r.peso); }
+    });
+    return prs;
+  }
+
+  // ---------- Pintado ----------
+
+  function pintar() {
+    pintarStats();
+    pintarListas();
+    pintarGrafica();
+    pintarHistorial();
+  }
+
+  function pintarStats() {
+    const dias = new Set(registros.map(r => r.fecha));
+    const semana = [...dias].filter(f => { const d = diasDesde(f); return d >= 0 && d < 7; }).length;
+    const vol = registros.reduce((s, r) => s + volumen(r), 0);
+    $('#stDias').textContent = dias.size;
+    $('#stSemana').textContent = semana;
+    $('#stVolumen').textContent = vol >= 10000 ? `${num(Math.round(vol / 100) / 10)} t` : num(vol);
+  }
+
+  function pintarListas() {
+    const nombres = nombresEjercicios();
+    const datalist = $('#listaEj');
+    datalist.replaceChildren(...[...new Set([...nombres.values(), ...SUGERENCIAS])].map(n => el('option', { value: n })));
+
+    const sel = $('#selEj');
+    const ordenados = [...nombres].sort((a, b) => a[1].localeCompare(b[1], 'es'));
+    if (!nombres.has(ejSeleccionado)) ejSeleccionado = ordenados[0]?.[0] || '';
+    sel.replaceChildren(...ordenados.map(([k, n]) => el('option', { value: k, textContent: n })));
+    sel.value = ejSeleccionado;
+    sel.hidden = !ordenados.length;
+  }
+
+  function pintarGrafica() {
+    const svg = $('#grafica');
+    const info = $('#infoGrafica');
+    if (!ejSeleccionado) {
+      svg.replaceChildren();
+      svg.style.display = 'none';
+      info.textContent = 'Guarda algún ejercicio para ver aquí tu progreso.';
+      return;
+    }
+    svg.style.display = '';
+
+    // Peso máximo de cada día
+    const porFecha = new Map();
+    delEjercicio(ejSeleccionado).forEach(r => porFecha.set(r.fecha, Math.max(porFecha.get(r.fecha) ?? -Infinity, r.peso)));
+    const pts = [...porFecha].sort((a, b) => a[0].localeCompare(b[0]));
+    const pesos = pts.map(p => p[1]);
+    const lo = Math.min(...pesos), hi = Math.max(...pesos);
+
+    const W = svg.getBoundingClientRect().width || 560, H = 200;
+    const L = 48, R = 14, T = 14, B = 26;
+    const margen = hi === lo ? Math.max(5, hi * 0.1) : (hi - lo) * 0.15;
+    const yMin = Math.max(0, lo - margen), yMax = hi + margen;
+    const x = i => pts.length === 1 ? (L + W - R) / 2 : L + i * (W - L - R) / (pts.length - 1);
+    const y = v => T + (yMax - v) * (H - T - B) / (yMax - yMin);
+
+    let s = '';
+    for (const v of new Set([lo, (lo + hi) / 2, hi])) {
+      s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/>`;
+      s += `<text x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${num(Math.round(v * 10) / 10)}</text>`;
+    }
+    const linea = pts.map((p, i) => `${x(i)},${y(p[1])}`).join(' ');
+    if (pts.length > 1) {
+      s += `<polygon class="area" points="${x(0)},${H - B} ${linea} ${x(pts.length - 1)},${H - B}"/>`;
+      s += `<polyline class="linea" points="${linea}"/>`;
+    }
+    pts.forEach((p, i) => {
+      s += `<circle class="${p[1] === hi ? 'top' : ''}" cx="${x(i)}" cy="${y(p[1])}" r="5"><title>${fechaCorta(p[0])}: ${kg(p[1])}</title></circle>`;
+    });
+    s += `<text x="${x(0)}" y="${H - 6}" text-anchor="${pts.length === 1 ? 'middle' : 'start'}">${fechaCorta(pts[0][0])}</text>`;
+    if (pts.length > 1) s += `<text x="${x(pts.length - 1)}" y="${H - 6}" text-anchor="end">${fechaCorta(pts.at(-1)[0])}</text>`;
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.innerHTML = s;
+
+    if (pts.length === 1) {
+      info.textContent = `Primer registro: ${kg(hi)}. Vuelve a entrenarlo para ver la línea de progreso.`;
+    } else {
+      const dif = pts.at(-1)[1] - pts[0][1];
+      const tendencia = dif > 0 ? `📈 +${kg(dif)} desde el primer día` : dif < 0 ? `📉 ${kg(dif)} desde el primer día` : 'Igual que el primer día';
+      info.textContent = `Récord: ${kg(hi)} · ${tendencia} · ${pts.length} sesiones`;
+    }
+  }
+
+  function pintarHistorial() {
+    const cont = $('#historial');
+    if (!registros.length) {
+      const demo = el('button', { type: 'button', className: 'sec', textContent: 'Probar con datos de ejemplo', onclick: cargarDemo });
+      cont.replaceChildren(el('div', { className: 'vacio' }, el('p', { textContent: 'Aún no hay nada registrado. ¡A por ello! 💪' }), demo));
+      return;
+    }
+    const prs = calcularRecords();
+    const porDia = new Map();
+    [...registros].sort((a, b) => ordenar(b, a)).forEach(r => {
+      if (!porDia.has(r.fecha)) porDia.set(r.fecha, []);
+      porDia.get(r.fecha).push(r);
+    });
+
+    const dias = [...porDia].map(([fecha, lista]) => {
+      const vol = lista.reduce((s, r) => s + volumen(r), 0);
+      const cabecera = el('h3', {}, el('span', { textContent: fechaLarga(fecha) }), el('span', { textContent: `${num(vol)} kg` }));
+      const items = lista.map(r => el('li', {},
+        el('button', {
+          type: 'button', className: 'ej', textContent: r.ejercicio, title: 'Ver progreso',
+          onclick: () => { ejSeleccionado = clave(r.ejercicio); pintarListas(); pintarGrafica(); $('#seccionProgreso').scrollIntoView({ behavior: 'smooth' }); }
+        }),
+        ...(prs.has(r.id) ? [el('span', { className: 'badge', textContent: '🏆 PR' })] : []),
+        el('span', { className: 'det', textContent: `${kg(r.peso)} · ${r.series}×${r.reps}` }),
+        el('button', { type: 'button', className: 'borrar', textContent: '×', ariaLabel: `Borrar ${r.ejercicio}`, onclick: () => borrar(r) })
+      ));
+      return el('div', { className: 'dia' }, cabecera, el('ul', {}, ...items));
+    });
+    cont.replaceChildren(...dias);
+  }
+
+  function actualizarPista() {
+    const p = $('#pista');
+    const previos = delEjercicio(clave($('#ejercicio').value)).sort(ordenar);
+    if (!previos.length) { p.hidden = true; return; }
+    const ult = previos.at(-1);
+    const record = Math.max(...previos.map(r => r.peso));
+    const repetir = el('button', {
+      type: 'button', textContent: 'Repetir',
+      onclick: () => { $('#peso').value = num(ult.peso); $('#series').value = ult.series; $('#reps').value = ult.reps; $('#peso').focus(); }
+    });
+    p.replaceChildren(`Última vez (${haceCuanto(ult.fecha)}): ${kg(ult.peso)} · ${ult.series}×${ult.reps} — Récord: ${kg(record)}`, repetir);
+    p.hidden = false;
+  }
+
+  // ---------- Toast ----------
+
+  let toastTimer;
+  function toast(msg, { tipo = '', accion } = {}) {
+    const t = $('#toast');
+    t.replaceChildren(el('span', { textContent: msg }));
+    if (accion) t.append(el('button', { type: 'button', textContent: accion.texto, onclick: () => { accion.fn(); t.classList.remove('visible'); } }));
+    t.className = `toast ${tipo}`;
+    void t.offsetWidth; // reinicia la animación
+    t.classList.add('visible');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('visible'), accion ? 6000 : 3500);
+  }
+
+  // ---------- Acciones ----------
+
+  function nuevoId() {
+    return crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
+  }
+
+  $('#form').addEventListener('submit', e => {
+    e.preventDefault();
+    const nombre = normalizar($('#ejercicio').value);
+    if (!nombre) return;
+    const r = {
+      id: nuevoId(),
+      ejercicio: nombre,
+      peso: Number($('#peso').value.replace(',', '.')),
+      series: Number($('#series').value),
+      reps: Number($('#reps').value),
+      fecha: $('#fecha').value || hoy(),
+      creado: Date.now(),
+    };
+    const previos = delEjercicio(clave(nombre));
+    const maxPrevio = previos.length ? Math.max(...previos.map(p => p.peso)) : null;
+
+    registros.push(r);
+    guardar();
+    ejSeleccionado = clave(nombre);
+    pintar();
+
+    if (maxPrevio !== null && r.peso > maxPrevio) toast(`🏆 ¡Nuevo récord en ${nombre}: ${kg(r.peso)}!`, { tipo: 'pr' });
+    else toast(`Guardado: ${nombre} · ${kg(r.peso)} · ${r.series}×${r.reps}`);
+
+    $('#ejercicio').value = '';
+    $('#peso').value = '';
+    actualizarPista();
+    $('#ejercicio').focus();
+  });
+
+  function borrar(r) {
+    registros = registros.filter(x => x.id !== r.id);
+    guardar();
+    pintar();
+    toast(`Borrado: ${r.ejercicio}`, { accion: { texto: 'Deshacer', fn: () => { registros.push(r); guardar(); pintar(); } } });
+  }
+
+  $('#borrarTodo').addEventListener('click', () => {
+    if (!registros.length) return;
+    if (!confirm('¿Seguro que quieres borrar todos los registros? No se puede deshacer.')) return;
+    registros = [];
+    guardar();
+    pintar();
+  });
+
+  // CSV con ; y coma decimal para que Excel en español lo abra bien
+  $('#exportar').addEventListener('click', async () => {
+    if (!registros.length) { toast('No hay nada que exportar todavía'); return; }
+    const filas = [...registros].sort(ordenar).map(r =>
+      [r.fecha, `"${r.ejercicio.replace(/"/g, '""')}"`, String(r.peso).replace('.', ','), r.series, r.reps].join(';'));
+    const csv = '﻿' + ['fecha;ejercicio;peso_kg;series;reps', ...filas].join('\r\n');
+    const nombre = `registro-gym-${hoy()}.csv`;
+
+    // En el móvil abre el menú de compartir (Guardar en Archivos, WhatsApp, correo…)
+    const archivo = new File([csv], nombre, { type: 'text/csv' });
+    if (matchMedia('(pointer: coarse)').matches && navigator.canShare?.({ files: [archivo] })) {
+      try { await navigator.share({ files: [archivo] }); return; }
+      catch (e) { if (e.name === 'AbortError') return; }
+    }
+
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    el('a', { href: url, download: nombre }).click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+
+  function cargarDemo() {
+    const plan = [['Press banca', 50, 2.5], ['Sentadilla', 70, 5], ['Peso muerto', 90, 5]];
+    const sesiones = 10;
+    for (let i = 0; i < sesiones; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() - (sesiones - 1 - i) * 3);
+      plan.forEach(([ejercicio, base, paso], j) => {
+        const subida = Math.floor((i + j) / 2) * paso;
+        registros.push({ id: nuevoId(), ejercicio, peso: base + subida, series: 3, reps: 8, fecha: iso(d), creado: d.getTime() + j });
+      });
+    }
+    guardar();
+    pintar();
+    toast('Datos de ejemplo cargados. Bórralos cuando quieras con «Borrar todo».');
+  }
+
+  $('#ejercicio').addEventListener('input', actualizarPista);
+  $('#selEj').addEventListener('change', e => { ejSeleccionado = e.target.value; pintarGrafica(); });
+  window.addEventListener('resize', pintarGrafica);
+
+  $('#fecha').value = hoy();
+  $('#fecha').max = hoy();
+  pintar();
+</script>
+</body>
+</html>
